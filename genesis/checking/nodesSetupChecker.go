@@ -114,6 +114,9 @@ func (nsc *nodeSetupChecker) subtractStakedValue(
 		if check.IfNil(dh) {
 			return genesis.ErrNilDelegationHandler
 		}
+		if !bytes.Equal(dh.AddressBytes(), addressBytes) {
+			continue
+		}
 
 		addr, ok := delegated[string(dh.AddressBytes())]
 		if !ok {
@@ -184,6 +187,11 @@ func (nsc *nodeSetupChecker) createDelegatedValues(initialAccounts []genesis.Ini
 
 		delegatedAddr.value.Add(delegatedAddr.value, delegation.GetValue())
 		delegation.GetValue().SetUint64(0)
+	}
+
+	_, ok := delegated[""]
+	if ok {
+		fmt.Println("bubu")
 	}
 
 	return delegated
