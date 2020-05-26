@@ -50,6 +50,11 @@ func (txip *TxInterceptorProcessor) Save(data process.InterceptedData, _ p2p.Pee
 		return process.ErrWrongTypeAssertion
 	}
 
+	log.Debug("added to cache",
+		"hash", data.Hash(),
+		"sender shard ID", interceptedTx.SenderShardId(),
+		"receiver shard ID", interceptedTx.ReceiverShardId(),
+	)
 	cacherIdentifier := process.ShardCacherIdentifier(interceptedTx.SenderShardId(), interceptedTx.ReceiverShardId())
 	txip.shardedPool.AddData(
 		data.Hash(),

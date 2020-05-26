@@ -108,7 +108,7 @@ func (rrh *resolverRequestHandler) requestByHashes(destShardID uint32, hashes []
 	}
 
 	for _, txHash := range hashes {
-		log.Trace("requestByHashes", "hash", txHash)
+		log.Debug("requestByHashes", "hash", txHash)
 	}
 
 	go rrh.requestHashesWithDataSplit(unrequestedHashes, txResolver)
