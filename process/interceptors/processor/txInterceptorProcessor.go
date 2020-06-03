@@ -40,7 +40,9 @@ func (txip *TxInterceptorProcessor) Validate(data process.InterceptedData, _ p2p
 		return process.ErrWrongTypeAssertion
 	}
 
-	return txip.txValidator.CheckTxValidity(interceptedTx)
+	err := txip.txValidator.CheckTxValidity(interceptedTx)
+	log.Debug("Validate", "err", err)
+	return err
 }
 
 // Save will save the received data into the cacher

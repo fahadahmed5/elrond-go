@@ -3,6 +3,7 @@ package dataValidators
 import (
 	"fmt"
 
+	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/elrond-go/core"
 	"github.com/ElrondNetwork/elrond-go/core/check"
 	"github.com/ElrondNetwork/elrond-go/data/state"
@@ -11,6 +12,7 @@ import (
 )
 
 var _ process.TxValidator = (*txValidator)(nil)
+var log = logger.GetOrCreate("txvalidator")
 
 // txValidator represents a tx handler validator that doesn't check the validity of provided txHandler
 type txValidator struct {
@@ -58,6 +60,7 @@ func (txv *txValidator) CheckTxValidity(interceptedTx process.TxValidatorHandler
 	interceptedData, ok := interceptedTx.(process.InterceptedData)
 	if ok {
 		if txv.whiteListHandler.IsWhiteListed(interceptedData) {
+			log.Debug("CheckTxValidity: IsWhiteListed")
 			return nil
 		}
 	}
@@ -66,6 +69,7 @@ func (txv *txValidator) CheckTxValidity(interceptedTx process.TxValidatorHandler
 	txShardID := interceptedTx.SenderShardId()
 	senderIsInAnotherShard := shardID != txShardID
 	if senderIsInAnotherShard {
+		log.Debug("CheckTxValidity: senderIsInAnotherShard")
 		return nil
 	}
 
@@ -85,6 +89,10 @@ func (txv *txValidator) CheckTxValidity(interceptedTx process.TxValidatorHandler
 	lowerNonceInTx := txNonce < accountNonce
 	veryHighNonceInTx := txNonce > accountNonce+uint64(txv.maxNonceDeltaAllowed)
 	isTxRejected := lowerNonceInTx || veryHighNonceInTx
+
+	account, _ := accountHandler.(state.UserAccountHandler)
+	log.Debug("Account:", "sender", senderAddress, "nonce", accountHandler.GetNonce(), "balance", account.GetBalance())
+
 	if isTxRejected {
 		return fmt.Errorf("%w lowerNonceInTx: %v, veryHighNonceInTx: %v",
 			process.ErrWrongTransaction,
@@ -93,7 +101,7 @@ func (txv *txValidator) CheckTxValidity(interceptedTx process.TxValidatorHandler
 		)
 	}
 
-	account, ok := accountHandler.(state.UserAccountHandler)
+	account, ok = accountHandler.(state.UserAccountHandler)
 	if !ok {
 		return fmt.Errorf("%w, account is not of type *state.Account, address: %s",
 			process.ErrWrongTypeAssertion,

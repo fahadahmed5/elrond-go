@@ -580,7 +580,7 @@ func (txs *transactions) processAndRemoveBadTransaction(
 	sndShardId uint32,
 	dstShardId uint32,
 ) error {
-
+	log.Debug("processAndRemoveBadTransaction", "tx", txHash, "sender", tx.GetSndAddr(), "nonce", tx.GetNonce())
 	err := txs.txProcessor.ProcessTransaction(tx)
 	isTxTargetedForDeletion := errors.Is(err, process.ErrLowerNonceInTransaction) || errors.Is(err, process.ErrInsufficientFee)
 	if isTxTargetedForDeletion {
@@ -622,6 +622,7 @@ func (txs *transactions) notifyTransactionProviderIfNeeded() {
 
 		sortedTransactionsProvider := createSortedTransactionsProvider(txShardPool)
 		sortedTransactionsProvider.NotifyAccountNonce([]byte(senderAddress), account.GetNonce())
+		log.Debug("NotifyAccountNonce", "account", senderAddress, "nonce", account.GetNonce())
 	}
 	txs.mutAccountsInfo.RUnlock()
 }
@@ -907,7 +908,7 @@ func (txs *transactions) createAndProcessMiniBlocksFromMe(
 			}
 
 			numTxsBad++
-			log.Trace("bad tx",
+			log.Debug("bad tx",
 				"error", err.Error(),
 				"hash", txHash,
 			)

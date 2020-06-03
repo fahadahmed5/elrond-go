@@ -165,7 +165,8 @@ func (sc *scProcessor) ExecuteSmartContractTransaction(
 	if check.IfNil(tx) {
 		return process.ErrNilTransaction
 	}
-	log.Trace("scProcessor.ExecuteSmartContractTransaction()", "sc", tx.GetRcvAddr(), "data", string(tx.GetData()))
+
+	log.Debug("scProcessor.ExecuteSmartContractTransaction()", "sc", tx.GetRcvAddr(), "data", string(tx.GetData()), "sender", tx.GetSndAddr(), "nonce", tx.GetNonce(), "gas", tx.GetGasLimit(), "value", tx.GetValue())
 
 	err := sc.processSCPayment(tx, acntSnd)
 	if err != nil {
@@ -242,6 +243,7 @@ func (sc *scProcessor) ExecuteSmartContractTransaction(
 	}
 
 	vmOutput, err = vm.RunSmartContractCall(vmInput)
+	log.Debug("vmOutput", "code", vmOutput.ReturnCode.String(), "msg", vmOutput.ReturnMessage)
 	if err != nil {
 		log.Debug("run smart contract call error", "error", err.Error())
 		return nil
@@ -258,7 +260,7 @@ func (sc *scProcessor) ExecuteSmartContractTransaction(
 	var results []data.TransactionHandler
 	results, consumedFee, err = sc.processVMOutput(vmOutput, txHash, tx, acntSnd, vmInput.CallType)
 	if err != nil {
-		log.Trace("process vm output returned with problem ", "err", err.Error())
+		log.Debug("process vm output returned with problem ", "err", err.Error())
 		return nil
 	}
 
