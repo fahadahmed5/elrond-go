@@ -61,6 +61,8 @@ func (cache *TxCache) AddTx(tx *WrappedTransaction) (ok bool, added bool) {
 		return false, false
 	}
 
+	cache.monitorAddition(tx)
+
 	if cache.config.EvictionEnabled {
 		cache.doEviction()
 	}
@@ -103,6 +105,8 @@ func (cache *TxCache) SelectTransactions(numRequested int, batchSizePerSender in
 
 func (cache *TxCache) doSelectTransactions(numRequested int, batchSizePerSender int) []*WrappedTransaction {
 	stopWatch := cache.monitorSelectionStart()
+
+	cache.dumpContent()
 
 	result := make([]*WrappedTransaction, numRequested)
 	resultFillIndex := 0
@@ -156,6 +160,8 @@ func (cache *TxCache) doAfterSelection() {
 
 // RemoveTxByHash removes tx by hash
 func (cache *TxCache) RemoveTxByHash(txHash []byte) bool {
+	cache.monitorRemoval(txHash)
+
 	tx, foundInByHash := cache.txByHash.removeTx(string(txHash))
 	if !foundInByHash {
 		return false

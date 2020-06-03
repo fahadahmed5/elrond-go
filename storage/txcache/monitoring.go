@@ -6,6 +6,23 @@ import (
 )
 
 var log = logger.GetOrCreate("txcache")
+var logItems = logger.GetOrCreate("txcache/items")
+
+func (cache *TxCache) monitorAddition(tx *WrappedTransaction) {
+	logItems.Debug("TxCache items: add", "tx", tx.TxHash, "sender", tx.Tx.GetSndAddr(), "nonce", tx.Tx.GetNonce())
+}
+
+func (cache *TxCache) monitorRemoval(txHash []byte) {
+	logItems.Debug("TxCache items: remove", "tx", txHash)
+}
+
+func (cache *TxCache) dumpContent() {
+	logItems.Debug("TxCache content:")
+
+	cache.ForEachTransaction(func(txHash []byte, tx *WrappedTransaction) {
+		logItems.Debug("Content:", "tx", txHash, "sender", tx.Tx.GetSndAddr(), "nonce", tx.Tx.GetNonce())
+	})
+}
 
 func (cache *TxCache) monitorEvictionWrtSenderLimit(sender []byte, evicted [][]byte) {
 	log.Trace("TxCache.AddTx() evict transactions wrt. limit by sender", "name", cache.name, "sender", sender, "num", len(evicted))
