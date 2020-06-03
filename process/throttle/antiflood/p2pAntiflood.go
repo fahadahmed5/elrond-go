@@ -3,7 +3,7 @@ package antiflood
 import (
 	"fmt"
 
-	"github.com/ElrondNetwork/elrond-go-logger"
+	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/elrond-go/core/check"
 	"github.com/ElrondNetwork/elrond-go/p2p"
 	"github.com/ElrondNetwork/elrond-go/process"
@@ -74,7 +74,7 @@ func (af *p2pAntiflood) canProcessMessage(fp process.FloodPreventer, message p2p
 	//protect from directly connected peer
 	err := fp.IncreaseLoad(fromConnectedPeer.Pretty(), uint64(len(message.Data())))
 	if err != nil {
-		log.Trace("floodPreventer.IncreaseLoad connected peer",
+		log.Debug("floodPreventer.IncreaseLoad connected peer",
 			"error", err,
 			"pid", p2p.PeerIdToShortString(fromConnectedPeer),
 			"message payload bytes", uint64(len(message.Data())),
@@ -89,7 +89,7 @@ func (af *p2pAntiflood) canProcessMessage(fp process.FloodPreventer, message p2p
 		//protect from the flooding messages that originate from the same source but come from different peers
 		err = fp.IncreaseLoad(message.Peer().Pretty(), uint64(len(message.Data())))
 		if err != nil {
-			log.Trace("floodPreventer.IncreaseLoad originator",
+			log.Debug("floodPreventer.IncreaseLoad originator",
 				"error", err,
 				"pid", p2p.MessageOriginatorPid(message),
 				"message payload bytes", uint64(len(message.Data())),

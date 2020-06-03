@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"net/http"
 
+	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/elrond-go/api/errors"
 	"github.com/ElrondNetwork/elrond-go/api/wrapper"
 	"github.com/ElrondNetwork/elrond-go/data/transaction"
@@ -68,6 +69,8 @@ func Routes(router *wrapper.RouterWrapper) {
 	router.RegisterHandler(http.MethodPost, "/send-multiple", SendMultipleTransactions)
 	router.RegisterHandler(http.MethodGet, "/:txhash", GetTransaction)
 }
+
+var log = logger.GetOrCreate("routes")
 
 // SendTransaction will receive a transaction from the client and propagate it for processing
 func SendTransaction(c *gin.Context) {
@@ -151,6 +154,7 @@ func SendMultipleTransactions(c *gin.Context) {
 		}
 
 		err = ef.ValidateTransaction(tx)
+		log.Debug("ValidateTransaction", "tx", txHash, "nonce", tx.Nonce, "err", err)
 		if err != nil {
 			continue
 		}
@@ -160,6 +164,7 @@ func SendMultipleTransactions(c *gin.Context) {
 	}
 
 	numOfSentTxs, err := ef.SendBulkTransactions(txs)
+	log.Debug("SendBulkTransactions", "total", len(txs), "sent", numOfSentTxs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

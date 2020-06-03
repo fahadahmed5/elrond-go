@@ -1,6 +1,7 @@
 package interceptors
 
 import (
+	"encoding/json"
 	"sync"
 
 	logger "github.com/ElrondNetwork/elrond-go-logger"
@@ -108,20 +109,25 @@ func (mdi *MultiDataInterceptor) ProcessReceivedMessage(message p2p.MessageP2P, 
 		mdi.throttler.EndProcessing()
 	}()
 
+	log.Warn("ProcessReceivedMessage", "len", len(multiDataBuff))
 	for _, dataBuff := range multiDataBuff {
 		var interceptedData process.InterceptedData
 		interceptedData, err = mdi.interceptedData(dataBuff)
 		if err != nil {
+			log.Error("ProcessReceivedMessage", "err", err)
 			lastErrEncountered = err
 			wgProcess.Done()
 			continue
 		}
 
+		serialized, _ := json.Marshal(interceptedData)
+		log.Debug("processInterceptedData", "data", serialized)
+
 		isForCurrentShard := interceptedData.IsForCurrentShard()
 		isWhiteListed := mdi.whiteListRequest.IsWhiteListed(interceptedData)
 		shouldProcess := isForCurrentShard || isWhiteListed
 		if !shouldProcess {
-			log.Trace("intercepted data should not be processed",
+			log.Debug("intercepted data should not be processed",
 				"pid", p2p.MessageOriginatorPid(message),
 				"seq no", p2p.MessageOriginatorSeq(message),
 				"topics", message.Topics(),

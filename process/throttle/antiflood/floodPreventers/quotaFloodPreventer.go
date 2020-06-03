@@ -145,10 +145,12 @@ func (qfp *quotaFloodPreventer) increaseLoad(identifier string, size uint64) err
 	q.numReceivedMessages++
 	q.sizeReceivedMessages += size
 
+	log.Info("antiflood", "size", q.sizeReceivedMessages)
 	maxNumMessagesReached := qfp.isMaximumReached(uint64(qfp.computedMaxNumMessagesPerPeer), uint64(q.numReceivedMessages))
 	maxSizeMessagesReached := qfp.isMaximumReached(qfp.maxTotalSizePerPeer, q.sizeReceivedMessages)
 	isPeerQuotaReached := maxNumMessagesReached || maxSizeMessagesReached
 	if isPeerQuotaReached {
+		log.Error("ANTIFLOOD", "size", q.sizeReceivedMessages)
 		return fmt.Errorf("%w for pid %s", process.ErrSystemBusy, identifier)
 	}
 

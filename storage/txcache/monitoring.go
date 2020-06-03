@@ -9,7 +9,7 @@ var log = logger.GetOrCreate("txcache")
 var logItems = logger.GetOrCreate("txcache/items")
 
 func (cache *TxCache) monitorAddition(tx *WrappedTransaction) {
-	logItems.Debug("TxCache items: add", "name", cache.name, "tx", tx.TxHash, "sender", tx.Tx.GetSndAddr(), "nonce", tx.Tx.GetNonce(), "data", tx.Tx.GetData())
+	logItems.Debug("TxCache items: add", "name", cache.name, "tx", tx.TxHash, "sender", tx.Tx.GetSndAddr(), "nonce", tx.Tx.GetNonce(), "data", string(tx.Tx.GetData()))
 }
 
 func (cache *TxCache) monitorRemoval(tx *WrappedTransaction) {
