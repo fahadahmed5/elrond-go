@@ -622,7 +622,7 @@ func (txs *transactions) notifyTransactionProviderIfNeeded() {
 
 		sortedTransactionsProvider := createSortedTransactionsProvider(txShardPool)
 		sortedTransactionsProvider.NotifyAccountNonce([]byte(senderAddress), account.GetNonce())
-		log.Debug("NotifyAccountNonce", "account", senderAddress, "nonce", account.GetNonce())
+		log.Debug("NotifyAccountNonce", "account", []byte(senderAddress), "nonce", account.GetNonce())
 	}
 	txs.mutAccountsInfo.RUnlock()
 }

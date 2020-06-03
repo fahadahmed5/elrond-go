@@ -41,7 +41,7 @@ func (txip *TxInterceptorProcessor) Validate(data process.InterceptedData, _ p2p
 	}
 
 	err := txip.txValidator.CheckTxValidity(interceptedTx)
-	log.Debug("Validate", "err", err)
+	log.Debug("Validate", "nonce", interceptedTx.Transaction().GetNonce(), "data", string(interceptedTx.Transaction().GetData()), "err", err)
 	return err
 }
 

@@ -160,12 +160,12 @@ func (cache *TxCache) doAfterSelection() {
 
 // RemoveTxByHash removes tx by hash
 func (cache *TxCache) RemoveTxByHash(txHash []byte) bool {
-	cache.monitorRemoval(txHash)
-
 	tx, foundInByHash := cache.txByHash.removeTx(string(txHash))
 	if !foundInByHash {
 		return false
 	}
+
+	cache.monitorRemoval(tx)
 
 	foundInBySender := cache.txListBySender.removeTx(tx)
 	if !foundInBySender {

@@ -346,6 +346,11 @@ func (listForSender *txListForSender) hasInitialGap() bool {
 	firstTxNonce := firstTx.Tx.GetNonce()
 	accountNonce := listForSender.accountNonce.Get()
 	hasGap := firstTxNonce > accountNonce
+
+	if hasGap {
+		log.Warn("Gap detected", "tx", firstTx.TxHash, "nonce", firstTxNonce, "sender", firstTx.Tx.GetSndAddr())
+	}
+
 	return hasGap
 }
 
